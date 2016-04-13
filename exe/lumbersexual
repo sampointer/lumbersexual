@@ -3,6 +3,7 @@
 require "lumbersexual"
 require "slop"
 require "syslog"
+require "benchmark"
 
 options = Slop.parse do |o|
   o.string '-D', '--dictionaryfile', 'path to dictionary file', default: '/etc/dictionaries-common/words'
@@ -21,6 +22,11 @@ end
 facilities = [ Syslog::LOG_ALERT, Syslog::LOG_CRIT, Syslog::LOG_ERR, Syslog::LOG_WARNING, Syslog::LOG_NOTICE, Syslog::LOG_INFO, Syslog::LOG_DEBUG ]
 words = []
 File.open(options[:dictionaryfile]).each_line { |l| words << l.chomp }
+puts "Loaded #{words.size} words"
+puts "Timeout: #{options[:timeout]}"
+puts "Minimum words per message: #{options[:minwords]}"
+puts "Maximum words per message: #{options[:maxwords]}"
+puts "Running ..."
 
 # Run until we're done
 begin
@@ -39,5 +45,6 @@ begin
   }
 
 rescue Timeout::Error
+  puts "Complete"
   exit 0
 end
