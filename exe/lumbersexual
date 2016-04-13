@@ -1,3 +1,43 @@
 #!/usr/bin/env ruby
 
 require "lumbersexual"
+require "slop"
+require "syslog"
+
+options = Slop.parse do |o|
+  o.string '-D', '--dictionaryfile', 'path to dictionary file', default: '/etc/dictionaries-common/words'
+  o.integer '-t', '--timeout', 'length of execution. 0 for forever', default: 0
+  o.integer '-m', '--minwords', 'minimum number of words per message', default: 3
+  o.integer '-M', '--maxwords', 'maximum number of words per message', default: 20
+  o.bool '-h', '--help', 'print this message' 
+end
+
+if options.help?
+  puts options
+  exit
+end
+
+# Get our word corpus and define the facilities we can use
+facilities = [ Syslog::LOG_ALERT, Syslog::LOG_CRIT, Syslog::LOG_ERR, Syslog::LOG_WARNING, Syslog::LOG_NOTICE, Syslog::LOG_INFO, Syslog::LOG_DEBUG ]
+words = []
+File.open(options[:dictionaryfile]).each_line { |l| words << l.chomp }
+
+# Run until we're done
+begin
+  Timeout::timeout(options[:timeout]) {
+
+    while true do
+      # Connect to syslog with some sane options and log a message
+      syslog = Syslog.open("lumbersexual-#{words.sample}", Syslog::LOG_CONS | Syslog::LOG_NDELAY)
+      message = String.new
+      number_of_words = rand(options[:minwords]..options[:maxwords])
+      words.sample(number_of_words).each { |w| message << "#{w} " }
+      Syslog.log(facilities.sample, message)
+      Syslog.close
+    end
+
+  }
+
+rescue Timeout::Error
+  exit 0
+end
