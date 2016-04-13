@@ -29,6 +29,7 @@ puts "Maximum words per message: #{options[:maxwords]}"
 puts "Running ..."
 
 # Run until we're done
+count = 0
 puts Benchmark.measure {
   begin
     Timeout::timeout(options[:timeout]) {
@@ -40,12 +41,14 @@ puts Benchmark.measure {
 	number_of_words = rand(options[:minwords]..options[:maxwords])
 	words.sample(number_of_words).each { |w| message << "#{w} " }
 	Syslog.log(facilities.sample, message)
+        count += 1
 	Syslog.close
       end
 
     }
 
   rescue Timeout::Error
+    puts "Sent #{count}"
     puts "Complete"
   end
 }
