@@ -30,6 +30,7 @@ puts "Running ..."
 
 # Run until we're done
 count = 0
+puts Time.now
 puts Benchmark.measure {
   begin
     Timeout::timeout(options[:timeout]) {
@@ -48,6 +49,7 @@ puts Benchmark.measure {
     }
 
   rescue Timeout::Error
+    puts Time.now
     puts "Sent #{count}"
     puts "Complete"
   end
