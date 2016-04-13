@@ -29,22 +29,23 @@ puts "Maximum words per message: #{options[:maxwords]}"
 puts "Running ..."
 
 # Run until we're done
-begin
-  Timeout::timeout(options[:timeout]) {
+puts Benchmark.measure {
+  begin
+    Timeout::timeout(options[:timeout]) {
 
-    while true do
-      # Connect to syslog with some sane options and log a message
-      syslog = Syslog.open("lumbersexual-#{words.sample}", Syslog::LOG_CONS | Syslog::LOG_NDELAY)
-      message = String.new
-      number_of_words = rand(options[:minwords]..options[:maxwords])
-      words.sample(number_of_words).each { |w| message << "#{w} " }
-      Syslog.log(facilities.sample, message)
-      Syslog.close
-    end
+      while true do
+	# Connect to syslog with some sane options and log a message
+	syslog = Syslog.open("lumbersexual-#{words.sample}", Syslog::LOG_CONS | Syslog::LOG_NDELAY)
+	message = String.new
+	number_of_words = rand(options[:minwords]..options[:maxwords])
+	words.sample(number_of_words).each { |w| message << "#{w} " }
+	Syslog.log(facilities.sample, message)
+	Syslog.close
+      end
 
-  }
+    }
 
-rescue Timeout::Error
-  puts "Complete"
-  exit 0
-end
+  rescue Timeout::Error
+    puts "Complete"
+  end
+}
