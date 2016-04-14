@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "lumbersexual"
   spec.version       = Lumbersexual::VERSION
   spec.authors       = ["Sam Pointer"]
-  spec.email         = ["sam.pointer@opsunit.com"]
+  spec.email         = ["sam.pointer@outsidethe.net"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Generate randomized syslog messages}
+  spec.description   = %q{This gem generates random-enough syslog entries for the purposes of testing syslog throughput, aggregated logging infrastructures and log index performance.}
+  spec.homepage      = "https://github.com/sampointer/lumbersexual"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
