@@ -1,28 +1,18 @@
 # Lumbersexual
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/lumbersexual`. To experiment with that code, run `bin/console` for an interactive prompt.
+This gem generates random-enough syslog entries for the purposes of testing syslog throughput, aggregated logging infrastructures and log index performance.
 
-TODO: Delete this and the text above, and describe your gem
+## Requirements
 
-## Installation
+Whilst `lumbersexual` will run correctly under MRI ruby the best performance at scale can be obtained by using JRuby jruby-9.0.5.0 or later under Java 7. Furthermore throughput is greatest and most accurate with machines with 4 cores or more. By default twice as many threads as cores in the host will be used.
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'lumbersexual'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install lumbersexual
+A dictionary file is needed from which to generate the randomized messages. Under Debian-derived distributions `apt-get install dictionaries-common` is not a bad place to start.
 
 ## Usage
 
-TODO: Write usage instructions here
+```bash
+$ lumbersexual --help
+```
 
 ## Development
 
@@ -32,10 +22,8 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/lumbersexual.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/sampointer/lumbersexual.
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
