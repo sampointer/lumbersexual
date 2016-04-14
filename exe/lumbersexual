@@ -10,6 +10,8 @@ options = Slop.parse do |o|
   o.integer '-t', '--timeout', 'length of execution. 0 for forever', default: 0
   o.integer '-m', '--minwords', 'minimum number of words per message', default: 3
   o.integer '-M', '--maxwords', 'maximum number of words per message', default: 20
+  o.array   '-p', '--priorities', 'additional comma-seperated priorities', default: []
+  o.array   '-f', '--facilities', 'additional comma-seperated facilities', default: []
   o.bool    '-h', '--help', 'print this message' 
 end
 
@@ -18,8 +20,12 @@ if options.help?
   exit
 end
 
-# Get our word corpus and define the facilities we can use
-facilities = [ Syslog::LOG_ALERT, Syslog::LOG_CRIT, Syslog::LOG_ERR, Syslog::LOG_WARNING, Syslog::LOG_NOTICE, Syslog::LOG_INFO, Syslog::LOG_DEBUG ]
+# Get our word corpus and define the priorities and facilities we can use
+facilities = [ Syslog::LOG_ALERT, Syslog::LOG_CRIT, Syslog::LOG_ERR, Syslog::LOG_WARNING, Syslog::LOG_NOTICE, Syslog::LOG_INFO ]
+options[:facilities].each { |f| facilities << Object.const_get(Syslog).const_get["LOG_#{f.upcase}"] }
+priorities = [ Syslog::LOG_AUTHPRIV, Syslog::LOG_CRON, Syslog::LOG_DAEMON, Syslog::LOG_FTP, Syslog::LOG_LPR, Syslog::LOG_MAIL, Syslog::LOG_NEWS, Syslog::LOG_NTP, Syslog::LOG_SECURITY, Syslog::LOG_SYSLOG, Syslog::LOG_USER, Syslog::LOG_UUCPR]
+0..7.each { |n| priorities << Object.const_get(Syslog).const_get("LOCAL#{n}")}
+
 words = []
 File.open(options[:dictionaryfile]).each_line { |l| words << l.chomp }
 puts "Loaded #{words.size} words"
@@ -37,11 +43,11 @@ puts Benchmark.measure {
 
       while true do
 	# Connect to syslog with some sane options and log a message
-	syslog = Syslog.open("lumbersexual-#{words.sample}", Syslog::LOG_CONS | Syslog::LOG_NDELAY)
+	syslog = Syslog.open("lumbersexual-#{words.sample}", Syslog::LOG_CONS | Syslog::LOG_NDELAY, facilities.sample)
 	message = String.new
 	number_of_words = rand(options[:minwords]..options[:maxwords])
 	words.sample(number_of_words).each { |w| message << "#{w} " }
-	Syslog.log(facilities.sample, message)
+	Syslog.log(priorities.sample, message)
         count += 1
 	Syslog.close
       end
