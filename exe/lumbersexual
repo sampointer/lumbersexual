@@ -35,8 +35,6 @@ puts "Timeout: #{options[:timeout]}"
 puts "Threads: #{options[:threads]}"
 puts "Minimum words per message: #{options[:minwords]}"
 puts "Maximum words per message: #{options[:maxwords]}"
-puts "Facilities: #{facilities.join(',')}"
-puts "Priorities: #{priorities.join(',')}"
 puts "Running ..."
 
 # Run until we're done
