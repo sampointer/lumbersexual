@@ -22,6 +22,14 @@ if options.help?
   exit
 end
 
+count = 0
+trap('INT') {
+    puts Time.now
+    puts "Sent #{count}"
+    puts "Complete"
+    exit 0
+}
+
 # Get our word corpus and define the priorities and facilities we can use
 facilities = [ Syslog::LOG_ALERT, Syslog::LOG_CRIT, Syslog::LOG_ERR, Syslog::LOG_WARNING, Syslog::LOG_NOTICE, Syslog::LOG_INFO ]
 options[:facilities].each { |f| facilities << Object.const_get('Syslog').const_get["LOG_#{f.upcase}"] }
@@ -38,7 +46,6 @@ puts "Maximum words per message: #{options[:maxwords]}"
 puts "Running ..."
 
 # Run until we're done
-count = 0
 threads = []
 mutex = Mutex.new
 puts Time.now
@@ -73,8 +80,6 @@ puts Benchmark.measure {
     }
 
   rescue Timeout::Error
-    puts Time.now
-    puts "Sent #{count}"
-    puts "Complete"
+    raise Interrupt
   end
 }
