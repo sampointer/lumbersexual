@@ -4,6 +4,7 @@ require "lumbersexual"
 require "slop"
 require "syslog"
 require "thread"
+require "timeout"
 
 options = Slop.parse do |o|
   o.string  '-D', '--dictionaryfile', 'path to dictionary file (default: /etc/dictionaries-common/words)', default: '/etc/dictionaries-common/words'
@@ -82,10 +83,11 @@ begin
     }
   end
 
-  threads.each {|t| t.join(options[:timeout])}
+  Timeout::timeout(options[:timeout]) {
+    threads.each {|t| t.join}
+  }
 
-rescue Interrupt
-ensure
+rescue Timeout::Error, Interrupt
   end_time = Time.now
   elapsed = end_time - start_time
   puts "Sent: #{global_count}"
