@@ -80,5 +80,6 @@ puts Benchmark.measure {
     puts Time.now
     puts "Sent #{count}"
     puts "Complete"
+    exit 0
   end
 }
