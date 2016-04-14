@@ -4,6 +4,7 @@ require "lumbersexual"
 require "slop"
 require "syslog"
 require "benchmark"
+require "thread"
 
 options = Slop.parse do |o|
   o.string  '-D', '--dictionaryfile', 'path to dictionary file (default: /etc/dictionaries-common/words)', default: '/etc/dictionaries-common/words'
@@ -41,6 +42,7 @@ puts "Running ..."
 # Run until we're done
 count = 0
 threads = []
+mutex = Mutex.new
 puts Time.now
 puts Benchmark.measure {
   begin
@@ -50,13 +52,20 @@ puts Benchmark.measure {
         threads << Thread.new {
 	  while true do
 	    # Connect to syslog with some sane options and log a message
-	    syslog = Syslog.open("lumbersexual-#{words.sample}", Syslog::LOG_CONS | Syslog::LOG_NDELAY, facilities.sample)
 	    message = String.new
 	    number_of_words = rand(options[:minwords]..options[:maxwords])
 	    words.sample(number_of_words).each { |w| message << "#{w} " }
-	    Syslog.log(priorities.sample, message)
-	    count += 1
-	    Syslog.close
+            ident = "lumbersexual-#{words.sample}"
+            facility = facilities.sample
+            priority = priorities.sample
+
+            mutex.synchronize {
+	      syslog = Syslog.open(ident, Syslog::LOG_CONS | Syslog::LOG_NDELAY, facility)
+	      Syslog.log(priority, message)
+	      count += 1
+	      Syslog.close
+            }
+
 	  end
         }
       end
