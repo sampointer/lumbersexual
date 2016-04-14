@@ -76,9 +76,9 @@ begin
 	sleep pause
 	mutex.synchronize {
 	  syslog = Syslog.open(ident, Syslog::LOG_CONS | Syslog::LOG_NDELAY, facility)
-	  Syslog.log(priority, message)
+	  syslog.log(priority, message)
 	  global_count += 1
-	  Syslog.close
+	  syslog.close
 	}
 
       end
