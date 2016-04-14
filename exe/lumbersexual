@@ -22,12 +22,8 @@ if options.help?
   exit
 end
 
-count = 0
 trap('INT') {
-    puts Time.now
-    puts "Sent #{count}"
-    puts "Complete"
-    exit 0
+  raise Interrupt
 }
 
 # Get our word corpus and define the priorities and facilities we can use
@@ -46,6 +42,7 @@ puts "Maximum words per message: #{options[:maxwords]}"
 puts "Running ..."
 
 # Run until we're done
+count = 0
 threads = []
 mutex = Mutex.new
 puts Time.now
@@ -79,7 +76,9 @@ puts Benchmark.measure {
 
     }
 
-  rescue Timeout::Error
-    raise Interrupt
+  rescue Timeout::Error, Interrupt
+    puts Time.now
+    puts "Sent #{count}"
+    puts "Complete"
   end
 }
