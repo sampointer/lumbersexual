@@ -6,10 +6,11 @@ require "syslog"
 require "benchmark"
 
 options = Slop.parse do |o|
-  o.string  '-D', '--dictionaryfile', 'path to dictionary file', default: '/etc/dictionaries-common/words'
-  o.integer '-t', '--timeout', 'length of execution. 0 for forever', default: 0
-  o.integer '-m', '--minwords', 'minimum number of words per message', default: 3
-  o.integer '-M', '--maxwords', 'maximum number of words per message', default: 20
+  o.string  '-D', '--dictionaryfile', 'path to dictionary file (default: /etc/dictionaries-common/words)', default: '/etc/dictionaries-common/words'
+  o.integer '-t', '--timeout', 'length of execution. 0 for forever (default: 0)', default: 0
+  o.integer '-T', '--threads', 'number of threads (defaults to number of cores)', default: Etc.nprocessors
+  o.integer '-m', '--minwords', 'minimum number of words per message (default: 3)', default: 3
+  o.integer '-M', '--maxwords', 'maximum number of words per message (default: 20)', default: 20
   o.array   '-p', '--priorities', 'additional comma-seperated priorities', default: []
   o.array   '-f', '--facilities', 'additional comma-seperated facilities', default: []
   o.bool    '-h', '--help', 'print this message' 
@@ -30,27 +31,37 @@ words = []
 File.open(options[:dictionaryfile]).each_line { |l| words << l.chomp }
 puts "Loaded #{words.size} words"
 puts "Timeout: #{options[:timeout]}"
+puts "Threads: #{options[:threads]}"
 puts "Minimum words per message: #{options[:minwords]}"
 puts "Maximum words per message: #{options[:maxwords]}"
+puts "Facilities: #{facilities.join(',')}"
+puts "Priorities: #{priorities.join(',')}"
 puts "Running ..."
 
 # Run until we're done
 count = 0
+threads = []
 puts Time.now
 puts Benchmark.measure {
   begin
     Timeout::timeout(options[:timeout]) {
 
-      while true do
-	# Connect to syslog with some sane options and log a message
-	syslog = Syslog.open("lumbersexual-#{words.sample}", Syslog::LOG_CONS | Syslog::LOG_NDELAY, facilities.sample)
-	message = String.new
-	number_of_words = rand(options[:minwords]..options[:maxwords])
-	words.sample(number_of_words).each { |w| message << "#{w} " }
-	Syslog.log(priorities.sample, message)
-        count += 1
-	Syslog.close
+      options[:threads].times do
+        threads << Thread.new {
+	  while true do
+	    # Connect to syslog with some sane options and log a message
+	    syslog = Syslog.open("lumbersexual-#{words.sample}", Syslog::LOG_CONS | Syslog::LOG_NDELAY, facilities.sample)
+	    message = String.new
+	    number_of_words = rand(options[:minwords]..options[:maxwords])
+	    words.sample(number_of_words).each { |w| message << "#{w} " }
+	    Syslog.log(priorities.sample, message)
+	    count += 1
+	    Syslog.close
+	  end
+        }
       end
+
+      threads.each {|t| t.join}
 
     }
 
