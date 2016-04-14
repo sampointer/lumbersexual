@@ -14,6 +14,7 @@ options = Slop.parse do |o|
   o.integer '-M', '--maxwords', 'maximum number of words per message (default: 20)', default: 20
   o.array   '-p', '--priorities', 'additional comma-seperated priorities', default: []
   o.array   '-f', '--facilities', 'additional comma-seperated facilities', default: []
+  o.integer '-r', '--rate', 'messages per second per thread (default: 0, unlimited)', default: 0
   o.bool    '-h', '--help', 'print this message' 
 end
 
@@ -34,15 +35,25 @@ priorities = [ Syslog::LOG_AUTHPRIV, Syslog::LOG_CRON, Syslog::LOG_DAEMON, Syslo
 
 words = []
 File.open(options[:dictionaryfile]).each_line { |l| words << l.chomp }
+
+case options[:rate]
+when 0
+ pause = 0.0
+else
+  pause = 1.0 / options[:rate]
+end
+
 puts "Loaded #{words.size} words"
 puts "Timeout: #{options[:timeout]}"
 puts "Threads: #{options[:threads]}"
+puts "Rate per core: #{options[:rate]}/s"
+puts "Total rate: #{options[:rate] * options[:threads]}/s"
 puts "Minimum words per message: #{options[:minwords]}"
 puts "Maximum words per message: #{options[:maxwords]}"
 puts "Running ..."
 
 # Run until we're done
-count = 0
+global_count = 0
 threads = []
 mutex = Mutex.new
 puts Time.now
@@ -61,10 +72,11 @@ puts Benchmark.measure {
             facility = facilities.sample
             priority = priorities.sample
 
+            sleep pause
             mutex.synchronize {
 	      syslog = Syslog.open(ident, Syslog::LOG_CONS | Syslog::LOG_NDELAY, facility)
 	      Syslog.log(priority, message)
-	      count += 1
+	      global_count += 1
 	      Syslog.close
             }
 
@@ -78,7 +90,7 @@ puts Benchmark.measure {
 
   rescue Timeout::Error, Interrupt
     puts Time.now
-    puts "Sent #{count}"
+    puts "Sent #{global_count}"
     puts "Complete"
     exit 0
   end
