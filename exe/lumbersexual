@@ -43,6 +43,7 @@ else
   pause = 1.0 / options[:rate]
 end
 
+puts "Runtime: #{RUBY_VERSION} #{RUBY_PLATFORM}"
 puts "Loaded #{words.size} words"
 puts "Timeout: #{options[:timeout]}"
 puts "Threads: #{options[:threads]}"
