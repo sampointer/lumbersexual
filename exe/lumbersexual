@@ -3,7 +3,6 @@
 require "lumbersexual"
 require "slop"
 require "syslog"
-require "benchmark"
 require "thread"
 
 options = Slop.parse do |o|
@@ -58,44 +57,40 @@ global_count = 0
 threads = []
 mutex = Mutex.new
 start_time = Time.now
-puts Benchmark.measure {
-  begin
-    Timeout::timeout(options[:timeout]) {
 
-      options[:threads].times do
-        threads << Thread.new {
-	  while true do
-	    # Connect to syslog with some sane options and log a message
-	    message = String.new
-	    number_of_words = rand(options[:minwords]..options[:maxwords])
-	    words.sample(number_of_words).each { |w| message << "#{w} " }
-            ident = "lumbersexual-#{words.sample}"
-            facility = facilities.sample
-            priority = priorities.sample
+begin
+  options[:threads].times do
+    threads << Thread.new {
+      while true do
+	# Connect to syslog with some sane options and log a message
+	message = String.new
+	number_of_words = rand(options[:minwords]..options[:maxwords])
+	words.sample(number_of_words).each { |w| message << "#{w} " }
+	ident = "lumbersexual-#{words.sample}"
+	facility = facilities.sample
+	priority = priorities.sample
 
-            sleep pause
-            mutex.synchronize {
-	      syslog = Syslog.open(ident, Syslog::LOG_CONS | Syslog::LOG_NDELAY, facility)
-	      Syslog.log(priority, message)
-	      global_count += 1
-	      Syslog.close
-            }
+	sleep pause
+	mutex.synchronize {
+	  syslog = Syslog.open(ident, Syslog::LOG_CONS | Syslog::LOG_NDELAY, facility)
+	  Syslog.log(priority, message)
+	  global_count += 1
+	  Syslog.close
+	}
 
-	  end
-        }
       end
-
-      threads.each {|t| t.join}
-
     }
-
-  rescue Timeout::Error, Interrupt
-    end_time = Time.now
-    elapsed = end_time - start_time
-    puts "Sent: #{global_count}"
-    puts "Elapsed time: #{elapsed}"
-    puts "Messages per second: #{global_count / elapsed}"
-    puts "Complete"
-    exit 0
   end
-}
+
+  threads.each {|t| t.join(options[:timeout])}
+
+rescue Interrupt
+ensure
+  end_time = Time.now
+  elapsed = end_time - start_time
+  puts "Sent: #{global_count}"
+  puts "Elapsed time: #{elapsed}"
+  puts "Messages per second: #{global_count / elapsed}"
+  puts "Complete"
+  exit 0
+end
