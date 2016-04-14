@@ -30,6 +30,7 @@ trap('INT') {
 # Get our word corpus and define the priorities and facilities we can use
 facilities = [ Syslog::LOG_ALERT, Syslog::LOG_CRIT, Syslog::LOG_ERR, Syslog::LOG_WARNING, Syslog::LOG_NOTICE, Syslog::LOG_INFO ]
 options[:facilities].each { |f| facilities << Object.const_get('Syslog').const_get["LOG_#{f.upcase}"] }
+
 priorities = [ Syslog::LOG_AUTHPRIV, Syslog::LOG_CRON, Syslog::LOG_DAEMON, Syslog::LOG_FTP, Syslog::LOG_LPR, Syslog::LOG_MAIL, Syslog::LOG_NEWS, Syslog::LOG_SYSLOG, Syslog::LOG_USER, Syslog::LOG_UUCP]
 0..7.times { |n| priorities << Object.const_get('Syslog').const_get("LOG_LOCAL#{n}")}
 
