@@ -5,7 +5,7 @@ This gem generates random-enough syslog entries for the purposes of testing sysl
 
 ## Requirements
 
-Whilst `lumbersexual` will run correctly under MRI ruby the best performance at scale can be obtained by using jruby-9.0.5.0 or later under Java 7. Furthermore throughput is greatest and most accurate with machines with 4 cores or more. By default twice as many threads as cores in the host will be used.
+Whilst `lumbersexual` will run correctly under MRI ruby the best performance at scale can be obtained by using jruby-9.0.5.0 or later under Java 7. Furthermore throughput is greatest and most accurate with machines with 4 cores or more. By default twice as many threads as cores will be used.
 
 A dictionary file is needed from which to generate the randomized messages. Under Debian-derived distributions `apt-get install dictionaries-common` is not a bad place to start.
 
