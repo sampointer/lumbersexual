@@ -22,7 +22,7 @@ By supplying the switch `--statsdhost` with a hostname you can turn on statsd me
 ```
 lumbersexual.thread.<UUID>.<facility>.<priority>.messages_sent 
 ```
-(where UUID is a randomized string for each thread) each time a message is successfully sent. The facility and priority are reported in their numeric form to save the overhead of a look for each write.
+(where UUID is a randomized string for each thread) each time a message is successfully sent. The facility and priority are reported in their numeric form to save the overhead of a lookup for each write.
 * At the end of a run the following metric paths will be produced:
 ```
 lumbersexual.run.messages_total # gauge
