@@ -18,16 +18,19 @@ $ lumbersexual --help
 ## Telemetry
 By supplying the switch `--statsdhost` with a hostname you can turn on statsd metric generation. Lumbersexual will assume it can write to a statsd-like daemon on UDP 8125 and will supply 2 types of telemetry.
 
-* During a run each thread will increment a counter at the path `lumbersexual.thread.<UUID>.<facility>.<priority>.messages_sent` (where UUID is a randomized string for each thread) each time a message is successfully sent. The facility and priority are reported in their numeric form to save the overhead of a look for each write.
+* During a run each thread will increment a counter at the path 
+```
+lumbersexual.thread.<UUID>.<facility>.<priority>.messages_sent 
+```
+(where UUID is a randomized string for each thread) each time a message is successfully sent. The facility and priority are reported in their numeric form to save the overhead of a look for each write.
 * At the end of a run the following metric paths will be produced:
-
 ```
 lumbersexual.run.messages_total # gauge
 lumbersexual.run.elapsed        # timer
 lumbersexual.run.rate           # gauge
 ```
 
-It is up to you to use the aggregation functions of telemetry system to combine these into a form you find acceptable.
+It is up to you to use the aggregation functions of your telemetry system to combine these into a form you find acceptable.
 
 ## Development
 
