@@ -1,4 +1,4 @@
-# Lumbersexual
+# Lumbersexual [![Build Status](https://travis-ci.org/sampointer/lumbersexual.svg?branch=master)](https://travis-ci.org/sampointer/lumbersexual)
 
 <img align="right" width="158" height="144" src="etc/assets/lumber-156795_960_720.png" alt="Lumbersexual" />
 This gem generates random-enough syslog entries for the purposes of testing syslog throughput, aggregated logging infrastructures and log index performance.
