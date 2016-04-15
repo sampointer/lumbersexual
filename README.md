@@ -15,6 +15,20 @@ A dictionary file is needed from which to generate the randomized messages. Unde
 $ lumbersexual --help
 ```
 
+## Telemetry
+By supplying the switch `--statsdhost` with a hostname you can turn on statsd metric generation. Lumbersexual will assume it can write to a statsd-like daemon on UDP 8125 and will supply 2 types of telemetry.
+
+* During a run each thread will increment a counter at the path `lumbersexual.thread.<UUID>` (where UUID is a randomized string for each thread) each time a message is successfully sent.
+* At the end of a run the following metric paths will be produced:
+
+```
+lumbersexual.run.messages_total # gauge
+lumbersexual.run.elapsed        # timer
+lumbersexual.run.rate           # gauge
+```
+
+It is up to you to use the aggregation functions of telemetry system to combine these into a form you find acceptable.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. Run `bundle exec lumbersexual` to use the gem in this directory, ignoring other installed copies of this gem.

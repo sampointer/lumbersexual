@@ -6,6 +6,8 @@ require "syslog"
 require "thread"
 require "timeout"
 require "etc"
+require "statsd-ruby"
+require "securerandom"
 
 options = Slop.parse do |o|
   o.string  '-D', '--dictionaryfile', 'path to dictionary file (default: /etc/dictionaries-common/words)', default: '/etc/dictionaries-common/words'
@@ -15,6 +17,7 @@ options = Slop.parse do |o|
   o.integer '-m', '--minwords', 'minimum number of words per message (default: 3)', default: 3
   o.array   '-p', '--priorities', 'additional comma-seperated priorities', default: []
   o.integer '-r', '--rate', 'messages per second per thread (default: 0, unlimited)', default: 0
+  o.string  '-s', '--statsdhost', 'send statsd telemetry to the named host (default: off)', default: nil
   o.integer '-T', '--threads', 'number of threads (defaults to number of cores * 2)', default: Etc.nprocessors * 2
   o.integer '-t', '--timeout', 'length of execution. 0 for forever (default: 0)', default: 0
 end
@@ -55,36 +58,43 @@ puts "Rate per thread: #{options[:rate]}/s"
 puts "Total rate: #{options[:rate] * options[:threads]}/s"
 puts "Minimum words per message: #{options[:minwords]}"
 puts "Maximum words per message: #{options[:maxwords]}"
+puts "Statsd host: #{options[:statsdhost]}" if options[:statsdhost]
 puts "Running ..."
 
 # Run until we're done
 global_count = 0
 threads = []
 mutex = Mutex.new
+statsd_global = Statsd.new if options[:statsdhost]
 start_time = Time.now
 
 begin
   options[:threads].times do
     threads << Thread.new {
-      while true do
-	# Connect to syslog with some sane options and log a message
-	message = String.new
-	number_of_words = rand(options[:minwords]..options[:maxwords])
-	words.sample(number_of_words).each { |w| message << "#{w} " }
-	ident = "lumbersexual-#{words.sample}"
-	facility = facilities.sample
-	priority = priorities.sample
+      # Configure telemetry
+      statsd = Statsd.new(options[:statsdhost]).tap { |s| s.namespace = "lumbersexual.thread.#{SecureRandom.uuid}" } if options[:statsdhost]
 
-	sleep pause
-	mutex.synchronize {
-	  syslog = Syslog.open(ident, Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, priority)
-	  syslog.log(facility, message)
-	  global_count += 1
-	  syslog.close
-	}
+      while true do
+        # Connect to syslog with some sane options and log a message
+        message = String.new
+        number_of_words = rand(options[:minwords]..options[:maxwords])
+        words.sample(number_of_words).each { |w| message << "#{w} " }
+        ident = "lumbersexual-#{words.sample}"
+        facility = facilities.sample
+        priority = priorities.sample
+
+        sleep pause
+        mutex.synchronize {
+          syslog = Syslog.open(ident, Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, priority)
+          syslog.log(facility, message)
+          global_count += 1
+          statsd.increment [ facility, priority, 'messages_sent' ].join('.') if options[:statsdhost]
+          syslog.close
+        }
 
       end
     }
+
   end
 
   Timeout::timeout(options[:timeout]) {
@@ -94,9 +104,14 @@ begin
 rescue Timeout::Error, Interrupt
   end_time = Time.now
   elapsed = end_time - start_time
-  puts "Sent: #{global_count}"
+  rate = global_count / elapsed
+  statsd_global = Statsd.new(options[:statsdhost]).tap { |s| s.namespace = "lumbersexual.run" } if options[:statsdhost]
+  puts "Sent: #{global_count}" 
+  statsd_global.gauge 'messages_total', global_count if options[:statsdhost]
   puts "Elapsed time: #{elapsed}"
-  puts "Messages per second: #{global_count / elapsed}"
+  statsd_global.timing 'elapsed', elapsed if options[:statsdhost]
+  puts "Messages per second: #{rate}"
+  statsd_global.gauge 'rate', rate if options[:statsdhost]
   puts "Complete"
   exit 0
 end
