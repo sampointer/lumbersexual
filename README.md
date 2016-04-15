@@ -1,5 +1,6 @@
 # Lumbersexual
 
+<img align="right" src="etc/assets/lumber-156795_960_720.png" alt="Lumbersexual" />
 This gem generates random-enough syslog entries for the purposes of testing syslog throughput, aggregated logging infrastructures and log index performance.
 
 ## Requirements
