@@ -1,7 +1,16 @@
 # Lumbersexual [![Build Status](https://travis-ci.org/sampointer/lumbersexual.svg?branch=master)](https://travis-ci.org/sampointer/lumbersexual) [![Gem Version](https://badge.fury.io/rb/lumbersexual.svg)](https://badge.fury.io/rb/lumbersexual)
 
 <img align="right" width="158" height="144" src="https://github.com/sampointer/lumbersexual/etc/assets/lumber-156795_960_720.png" alt="Lumbersexual" />
-This gem generates random-enough syslog entries for the purposes of testing syslog throughput, ELK stacks, aggregated logging infrastructures and log index performance.
+Benchmarking tool for the purposes of testing syslog throughput, ELK stacks, aggregated logging infrastructures and log index performance.
+
+## Introduction
+Lumbersexual provides both a means of generating load in order to test log aggregation infrastructures, and the means of measuring the latency of log ingestion by that infrastructure under load.
+
+In it's default form `lumbersexual` will generate random-enough syslog entries to generate various types of load for a log aggregation infrastructure: volume, breadth, syslog configuration, indexing performance.
+
+It can also be used to measure latency in a manner familiar to those who remember Maakit for MySQL. This can be used both for benchmarking and, by dint of generating telemetry, as a monitoring component.
+
+Together these two modes enable a logging infrastructure to be placed under stress, the ingestion latency measured and then the ongoing latency measured and alerted upon.
 
 ## Requirements
 
@@ -10,12 +19,15 @@ Whilst `lumbersexual` will run correctly under MRI 2.3.0 the best performance at
 A dictionary file is needed from which to generate the randomized messages. Under Debian-derived distributions `apt-get install wamerican; apt-get install dictionaries-common` is not a bad place to start.
 
 ## Usage
+### Load Generation, The Default Mode
+In the default mode Lumbersexual will generate random-enough syslog entries. Without passing additional options you may find the defaults to be extremely aggressive. A realword example might be:
 
 ```bash
-$ lumbersexual --help
+$ lumbersexual --maxwords 50 --minwords 4 --rate 100 --statsdhost localhost
 ```
 
-## Telemetry
+On a 2 core host `lumbersexual` will attempt to generate 200 syslog entries per second, generate statsd telemetry about the distribution across facilities and priorities of that load. Each log entry will be between 4 and 50 random words.
+
 By supplying the switch `--statsdhost` with a hostname you can turn on statsd metric generation. Lumbersexual will assume it can write to a statsd-like daemon on UDP 8125 and will supply 2 types of telemetry.
 
 * During a run each thread will increment a counter at the path 
