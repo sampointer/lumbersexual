@@ -14,7 +14,7 @@ Together these two modes enable a logging infrastructure to be placed under stre
 
 ## Requirements
 
-Whilst `lumbersexual` will run correctly under MRI 2.2.0 and lateer the best performance at scale can be obtained by using jruby-9.0.5.0 or later under Java 7. Furthermore throughput is greatest and most accurate with machines with 2 cores or more. By default twice as many threads as cores will be used.
+Whilst `lumbersexual` will run correctly under MRI 2.2.0 and later the best performance at scale can be obtained by using jruby-9.0.5.0 or later under Java 7. Furthermore throughput is greatest and most accurate with machines with 2 cores or more. By default twice as many threads as cores will be used.
 
 A dictionary file is needed from which to generate the randomized messages. Under Debian-derived distributions `apt-get install wamerican; apt-get install dictionaries-common` is not a bad place to start.
 
