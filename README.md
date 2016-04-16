@@ -49,7 +49,7 @@ Ingestion latency mode does the following:
 
 1. Generate a unique log entry, analogous to a `PING`.
 2. Start a timer
-3. Repeatedly interrogate an Elasticsearch endpoint
+3. Repeatedly interrogate an Elasticsearch endpoint until the `PING` is returned as a result
 4. Stop a timer
 5. Record the latency between the two events, and optionally emit it as statsd telemetry.
 
