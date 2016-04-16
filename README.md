@@ -45,15 +45,7 @@ lumbersexual.run.rate           # gauge
 It is up to you to use the aggregation functions of your telemetry system to combine these into a form you find acceptable.
 
 ### Ingestion Latency
-Ingestion latency mode does the following:
-
-1. Generate a unique log entry, analogous to a `PING`.
-2. Start a timer
-3. Repeatedly interrogate an Elasticsearch endpoint until the `PING` is returned as a result
-4. Stop a timer
-5. Record the latency between the two events, and optionally emit it as statsd telemetry.
-
-This is both useful for understanding the performance of a logging infrastructure under load and as a component in a telemetery-based monitoring system.
+Ingestion latency mode generates a syslog message with a unique identifier and then repeatedly queries the supplied ElasticSearch endpoint until that message is returned.  With the addition of the `--statsdhost` switch telemetry about this timing is generated. This is both useful for understanding the performance of a logging infrastructure under load and as a component in a telemetery-based monitoring system.
 ```bash
 $ lumbersexual --latency --uri https://my.elasticsearch.cluster:9200/ --statsdhost localhost
 ```
