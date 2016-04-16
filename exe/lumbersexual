@@ -2,13 +2,8 @@
 
 require "lumbersexual"
 require "slop"
-require "syslog"
-require "thread"
-require "timeout"
 require "etc"
-require "statsd-ruby"
-require "securerandom"
-require "URI"
+require "uri"
 
 options = Slop.parse do |o|
   o.string  '-D', '--dictionaryfile', 'path to dictionary file (default: /etc/dictionaries-common/words)', default: '/etc/dictionaries-common/words'
@@ -22,7 +17,7 @@ options = Slop.parse do |o|
   o.string  '-s', '--statsdhost', 'send statsd telemetry to the named host (default: off)', default: nil
   o.integer '-T', '--threads', 'number of threads (defaults to number of cores * 2)', default: Etc.nprocessors * 2
   o.integer '-t', '--timeout', 'length of execution. 0 for forever (default: 0)', default: 0
-  o.string  '-u', '--uri', 'elasticsearch uri when run in latency mode (default: http://localhost:9200/)', default: URI("http://localhost:9200/")
+  o.string  '-u', '--uri', 'elasticsearch uri when run in latency mode (default: http://localhost:9200/)', default: URI::parse("http://localhost:9200/")
 end
 
 if options.help?
@@ -30,93 +25,30 @@ if options.help?
   exit
 end
 
-options[:uri] = URI.parse(options[:uri])
+options[:uri] = URI.parse(options[:uri].to_s)
 
 trap('INT') {
   raise Interrupt
 }
 
-# Get our word corpus and define the priorities and facilities we can use
-facilities = [ Syslog::LOG_ALERT, Syslog::LOG_CRIT, Syslog::LOG_ERR, Syslog::LOG_WARNING, Syslog::LOG_NOTICE, Syslog::LOG_INFO ]
-options[:facilities].each { |f| facilities << Object.const_get('Syslog').const_get("LOG_#{f.upcase}") }
-
-priorities = [ Syslog::LOG_AUTHPRIV, Syslog::LOG_CRON, Syslog::LOG_DAEMON, Syslog::LOG_FTP, Syslog::LOG_LPR, Syslog::LOG_MAIL, Syslog::LOG_NEWS, Syslog::LOG_SYSLOG, Syslog::LOG_USER, Syslog::LOG_UUCP]
-0..7.times { |n| priorities << Object.const_get('Syslog').const_get("LOG_LOCAL#{n}")}
-options[:priorities].each { |p| priorities << Object.const_get('Syslog').const_get("LOG_#{p.upcase}") }
-
-words = []
-raise "Unable to find dictionary file at #{options[:dictionaryfile]}" unless File.exist?(options[:dictionaryfile])
-File.open(options[:dictionaryfile]).each_line { |l| words << l.chomp }
-
-case options[:rate]
-when 0
- pause = 0.0
-else
-  pause = 1.0 / options[:rate]
-end
-
-puts "Runtime: #{RUBY_VERSION} #{RUBY_PLATFORM}"
-puts "Loaded #{words.size} words"
-puts "Timeout: #{options[:timeout]}"
-puts "Threads: #{options[:threads]}"
-puts "Rate per thread: #{options[:rate]}/s"
-puts "Total rate: #{options[:rate] * options[:threads]}/s"
-puts "Minimum words per message: #{options[:minwords]}"
-puts "Maximum words per message: #{options[:maxwords]}"
-puts "Statsd host: #{options[:statsdhost]}" if options[:statsdhost]
-puts "Running ..."
-
-# Run until we're done
-global_count = 0
-threads = []
-mutex = Mutex.new
-statsd_global = Statsd.new if options[:statsdhost]
-start_time = Time.now
-
-begin
-  options[:threads].times do
-    threads << Thread.new {
-      # Configure telemetry
-      statsd = Statsd.new(options[:statsdhost]).tap { |s| s.namespace = "lumbersexual.thread.#{SecureRandom.uuid}" } if options[:statsdhost]
-
-      while true do
-        # Connect to syslog with some sane options and log a message
-        message = String.new
-        number_of_words = rand(options[:minwords]..options[:maxwords])
-        words.sample(number_of_words).each { |w| message << "#{w} " }
-        ident = "lumbersexual-#{words.sample}"
-        facility = facilities.sample
-        priority = priorities.sample
-
-        sleep pause
-        mutex.synchronize {
-          syslog = Syslog.open(ident, Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, priority)
-          syslog.log(facility, message)
-          global_count += 1
-          statsd.increment [ facility, priority, 'messages_sent' ].join('.') if options[:statsdhost]
-          syslog.close
-        }
-
-      end
-    }
-
+case options[:latency]
+when true
+  require 'lumbersexual/plugin/latency'
+  latency = Lumbersexual::Plugin::Latency.new(options)
+  begin
+    latency.perform
+  rescue Timeout::Error, Interrupt
+    latency.report
   end
-
-  Timeout::timeout(options[:timeout]) {
-    threads.each {|t| t.join}
-  }
-
-rescue Timeout::Error, Interrupt
-  end_time = Time.now
-  elapsed = end_time - start_time
-  rate = global_count / elapsed
-  statsd_global = Statsd.new(options[:statsdhost]).tap { |s| s.namespace = "lumbersexual.run" } if options[:statsdhost]
-  puts "Sent: #{global_count}" 
-  statsd_global.gauge 'messages_total', global_count if options[:statsdhost]
-  puts "Elapsed time: #{elapsed}"
-  statsd_global.timing 'elapsed', elapsed if options[:statsdhost]
-  puts "Messages per second: #{rate}"
-  statsd_global.gauge 'rate', rate if options[:statsdhost]
-  puts "Complete"
-  exit 0
+else
+  require 'lumbersexual/plugin/load_generator'
+  load_generator = Lumbersexual::Plugin::LoadGenerator.new(options)
+  begin
+    load_generator.perform
+  rescue Timeout::Error, Interrupt
+    load_generator.report
+  end
 end
+
+puts "Complete"
+exit 0
