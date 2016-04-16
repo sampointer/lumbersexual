@@ -8,11 +8,13 @@ require "timeout"
 require "etc"
 require "statsd-ruby"
 require "securerandom"
+require "URI"
 
 options = Slop.parse do |o|
   o.string  '-D', '--dictionaryfile', 'path to dictionary file (default: /etc/dictionaries-common/words)', default: '/etc/dictionaries-common/words'
   o.array   '-f', '--facilities', 'additional comma-seperated facilities', default: []
   o.bool    '-h', '--help', 'print this message' 
+  o.bool    '-l', '--latency', 'run in latency rather than generation mode (default: no)', default: nil
   o.integer '-M', '--maxwords', 'maximum number of words per message (default: 20)', default: 20
   o.integer '-m', '--minwords', 'minimum number of words per message (default: 3)', default: 3
   o.array   '-p', '--priorities', 'additional comma-seperated priorities', default: []
@@ -20,6 +22,7 @@ options = Slop.parse do |o|
   o.string  '-s', '--statsdhost', 'send statsd telemetry to the named host (default: off)', default: nil
   o.integer '-T', '--threads', 'number of threads (defaults to number of cores * 2)', default: Etc.nprocessors * 2
   o.integer '-t', '--timeout', 'length of execution. 0 for forever (default: 0)', default: 0
+  o.string  '-u', '--uri', 'elasticsearch uri when run in latency mode (default: http://localhost:9200/)', default: URI("http://localhost:9200/")
 end
 
 if options.help?

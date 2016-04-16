@@ -6,7 +6,7 @@ rvm:
 before_install: gem install bundler -v 1.10.6
 deploy:
   provider: rubygems
-  ruby: 'jruby-9.0.5.0'
+  ruby: jruby-9.0.5.0
   api_key:
     secure: qpkX3I/j5aXJvD5pBdiddZ63uCxMsQFeTsWkingDkLsxV/DPAiTn9orwmU3XnYfZfr7tU2z8UztHzqPtIfFmTD/v6FLDqLUzYL8SpfZIuu4BgzbFhQ7fpw2me6a1ISOGz5wkMQ34klZMuPZjX2x9KjrkDh8ZSsZziHi2cpkbj0JLW91ezW+W8yrQvOm/dch0uXMLEOlbxbjPjHr76bFQqvkc2Z0YprxK2j525t3+SEnVN51DiVGimPlUrIQ+mtjGOqbZYCMw4rBex+BdQS9T4as6pG/BT1Tk92MFE/gRMJg9QO/DqwolB3mGNBEYR+3skGktz2UBMSGu6XDFxEOqOgK0joe+ehfiL1Oq2hnp482vHODl06HjYIjVlsXGT7aD7C4TcA2yrRW5hg8UaYoVkIbiZz26GrXX8vEZ4C4HgRruQkyt31cLvhdRPJvStkXzgQQXbwmS6P3lkRE3gxwYyeuzblpbprg2Nolmt9GO//1yQ497YUsY18tK9fOZr8vz/xiCuDMQRuJcheA9C27Z9nJZB2iH4xTNwNl53eFYhWMVYdkw16JYWJ17xMg+VnWUwkA/jODU0GlXEvNHNFRaDA9qyedIk5ainAnzGJpExCsWuKFJvJl1Qn2bD3/neruCIBoCaxQOdBrGd/579ALyjkujRmgZTOiaqRh4DaYHGrg=
   gem: lumbersexual
