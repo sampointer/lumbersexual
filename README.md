@@ -44,6 +44,20 @@ lumbersexual.run.rate           # gauge
 
 It is up to you to use the aggregation functions of your telemetry system to combine these into a form you find acceptable.
 
+### Ingestion Latency
+Ingestion latency mode does the following:
+
+1. Generate a unique log entry, analogous to a `PING`.
+2. Start a timer
+3. Repeatedly interrogate an Elasticsearch endpoint
+4. Stop a timer
+5. Record the latency between the two events, and optionally emit it as statsd telemetry.
+
+This is both useful for understanding the performance of a logging infrastructure under load and as a component in a telemetery-based monitoring system.
+```bash
+$ lumbersexual --latency --uri https://my.elasticsearch.cluster:9200/ --statsdhost localhost
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. Run `bundle exec lumbersexual` to use the gem in this directory, ignoring other installed copies of this gem.
