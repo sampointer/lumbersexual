@@ -30,6 +30,8 @@ if options.help?
   exit
 end
 
+options[:uri] = URI.parse(options[:uri])
+
 trap('INT') {
   raise Interrupt
 }
