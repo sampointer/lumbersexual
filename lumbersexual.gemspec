@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Sam Pointer"]
   spec.email         = ["sam.pointer@outsidethe.net"]
 
-  spec.summary       = %q{Generate randomized syslog messages}
-  spec.description   = %q{This gem generates random-enough syslog entries for the purposes of testing syslog throughput, aggregated logging infrastructures and log index performance.}
+  spec.summary       = %q{Benchmark syslog, fluentd and ELK stacks}
+  spec.description   = %q{This gem generates random-enough syslog entries for the purposes of testing syslog throughput, ELK stacks, aggregated logging infrastructures and log index performance.}
   spec.homepage      = "https://github.com/sampointer/lumbersexual"
   spec.license       = "MIT"
 
