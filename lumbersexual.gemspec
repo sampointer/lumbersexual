@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "slop", "~> 4.3.0"
   spec.add_dependency "statsd-ruby", "~> 1.3.0"
+  spec.add_dependency "elasticsearch", "~> 1.0.17"
 end
