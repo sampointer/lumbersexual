@@ -34,20 +34,16 @@ trap('INT') {
 case options[:latency]
 when true
   require 'lumbersexual/plugin/latency'
-  latency = Lumbersexual::Plugin::Latency.new(options)
-  begin
-    latency.perform
-  rescue Timeout::Error, Interrupt
-    latency.report
-  end
+  plugin = Lumbersexual::Plugin::Latency.new(options)
 else
   require 'lumbersexual/plugin/load_generator'
-  load_generator = Lumbersexual::Plugin::LoadGenerator.new(options)
-  begin
-    load_generator.perform
-  rescue Timeout::Error, Interrupt
-    load_generator.report
-  end
+  plugin = Lumbersexual::Plugin::LoadGenerator.new(options)
+end
+
+begin
+  plugin.perform
+rescue Timeout::Error, Interrupt
+  plugin.report
 end
 
 puts "Complete"
