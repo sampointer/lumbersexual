@@ -6,7 +6,7 @@ require "etc"
 require "uri"
 
 options = Slop.parse do |o|
-  o.bool    '-A', '--all', 'search all indices rather than today\'s in latency mode', default: nil
+  o.bool    '-a', '--all', 'search all indices rather than today\'s in latency mode', default: nil
   o.string  '-D', '--dictionaryfile', 'path to dictionary file (default: /etc/dictionaries-common/words)', default: '/etc/dictionaries-common/words'
   o.array   '-f', '--facilities', 'additional comma-seperated facilities', default: []
   o.bool    '-h', '--help', 'print this message' 
