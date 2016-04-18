@@ -50,7 +50,7 @@ module Lumbersexual
 
         if @found
           latency = @end_time - @start_time
-          adjusted_latency = latency - (@options[:interval] @sleep_count)
+          adjusted_latency = latency - (@options[:interval] * @sleep_count)
           puts "Measured Latency: #{latency}"
           puts "Interval Adjusted Latency: #{adjusted_latency}"
           statsd.gauge 'runs.successful', 1 if @options[:statsdhost]
