@@ -24,7 +24,7 @@ module Lumbersexual
           index_name = Time.now.strftime('logstash-%Y.%m.%d')
         end
 
-        unique = "PING: #{SecureRandom.uuid}"
+        uuid = SecureRandom.uuid
         @start_time = Time.now
         Timeout::timeout(@options[:timeout]) {
           syslog = Syslog.open('lumbersexual-ping', Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, Syslog::LOG_INFO)
@@ -32,7 +32,7 @@ module Lumbersexual
           syslog.close
 
           until @found do
-            result = elastic.search index: index_name, q: unique
+            result = elastic.search index: index_name, q: uuid
             @found = true if result['hits']['total'] == 1
           end
         }
