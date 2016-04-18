@@ -50,6 +50,8 @@ Ingestion latency mode generates a syslog message with a unique identifier and t
 $ lumbersexual --latency --uri https://my.elasticsearch.cluster:9200/ --statsdhost localhost
 ```
 
+The `--all` switch can be used to choose between search today's index only (be careful around midnight!), or across all indicies. The latter is useful if you've a rolling online retention period and want to observe the effect on search latency by changes to that.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. Run `bundle exec lumbersexual` to use the gem in this directory, ignoring other installed copies of this gem.
