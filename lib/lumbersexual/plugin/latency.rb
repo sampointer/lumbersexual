@@ -28,7 +28,7 @@ module Lumbersexual
         @start_time = Time.now
         Timeout::timeout(@options[:timeout]) {
           syslog = Syslog.open('lumbersexual-ping', Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, Syslog::LOG_INFO)
-          syslog.log(Syslog::LOG_WARNING, unique)
+          syslog.log(Syslog::LOG_WARNING, uuid)
           syslog.close
 
           until @found do
