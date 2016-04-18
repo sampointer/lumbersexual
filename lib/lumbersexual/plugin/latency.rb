@@ -6,7 +6,6 @@ require "uri"
 require "syslog"
 require "timeout"
 require "elasticsearch"
-require "json"
 
 module Lumbersexual
   module Plugin
@@ -33,7 +32,7 @@ module Lumbersexual
           syslog.close
 
           until @found do
-            result = JSON.parse(elastic.search index: index_name, q: unique)
+            result = elastic.search index: index_name, q: unique
             @found = true if result['hits']['total'] == 1
           end
         }
