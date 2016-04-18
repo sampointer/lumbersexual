@@ -10,6 +10,7 @@ require "elasticsearch"
 module Lumbersexual
   module Plugin
     class Latency
+
       def initialize(options, *args)
         @options = options
         @found = false
@@ -25,6 +26,7 @@ module Lumbersexual
         end
 
         uuid = SecureRandom.uuid
+        @sleep_count = 0
         @start_time = Time.now
         Timeout::timeout(@options[:timeout]) {
           syslog = Syslog.open('lumbersexual-ping', Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, Syslog::LOG_INFO)
@@ -34,6 +36,8 @@ module Lumbersexual
           until @found do
             result = elastic.search index: index_name, q: uuid
             @found = true if result['hits']['total'] == 1
+            @sleep_count += 1
+            sleep @options[:interval]
           end
         }
 
@@ -45,9 +49,13 @@ module Lumbersexual
         statsd = Statsd.new(@options[:statsdhost]).tap { |s| s.namespace = "lumbersexual.latency" } if @options[:statsdhost]
 
         if @found
-          puts "Latency: #{@end_time - @start_time}"
+          latency = @end_time - @start_time
+          adjusted_latency = latency - (@options[:interval] @sleep_count)
+          puts "Measured Latency: #{latency}"
+          puts "Interval Adjusted Latency: #{adjusted_latency}"
           statsd.gauge 'runs.successful', 1 if @options[:statsdhost]
-          statsd.gauge 'rtt', @end_time - @start_time if @options[:statsdhost] if @options[:statsdhost]
+          statsd.gauge 'rtt.measured', latency if @options[:statsdhost] if @options[:statsdhost]
+          statsd.gauge 'rtt.adjusted', adjusted_latency if @options[:statsdhost] if @options[:statsdhost]
         else
           statsd.gauge 'runs.failed', 1 if @options[:statsdhost]
           puts "Latency: unknown, message not found"
