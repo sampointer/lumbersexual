@@ -5,6 +5,7 @@ require "securerandom"
 require "uri"
 require "syslog"
 require "timeout"
+require "elasticsearch"
 
 module Lumbersexual
   module Plugin
@@ -15,15 +16,24 @@ module Lumbersexual
       end
 
       def perform
-        uuid = SecureRandom.uuid
+        elastic = Elasticsearch::Client.new url: @options[:uri], log: true
+
+        if @options[:all]
+          index_name = '_all'
+        else
+          index_name = Time.now.strftime('logstash-%Y.%m.%d')
+        end
+
+        unique = "PING: #{SecureRandom.uuid}"
         @start_time = Time.now
         Timeout::timeout(@options[:timeout]) {
           syslog = Syslog.open('lumbersexual-ping', Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, Syslog::LOG_INFO)
-          syslog.log(Syslog::LOG_WARNING, "PING #{uuid}")
+          syslog.log(Syslog::LOG_WARNING, unique)
           syslog.close
 
-          # Search index for message
-          #
+          while true do
+            elastic.search index: index_name, q: unique
+          end
         }
 
         @end_time = Time.now
@@ -35,9 +45,10 @@ module Lumbersexual
 
         if @found
           puts "Latency: #{@end_time - @start_time}"
-          statsd.gauge 'rtt', @end_time - @start_time if @options[:statsdhost]
+          statsd.gauge 'runs.successful', 1 if @options[:statsdhost]
+          statsd.gauge 'rtt', @end_time - @start_time if @options[:statsdhost] if @options[:statsdhost]
         else
-          statsd.gauge 'runs.failed', 1
+          statsd.gauge 'runs.failed', 1 if @options[:statsdhost]
           puts "Latency: unknown, message not found"
         end
       end
