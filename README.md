@@ -47,10 +47,10 @@ It is up to you to use the aggregation functions of your telemetry system to com
 ### Ingestion Latency
 Ingestion latency mode generates a syslog message with a unique identifier and then repeatedly queries the supplied ElasticSearch endpoint until that message is returned.  With the addition of the `--statsdhost` switch telemetry about this timing is generated. This is both useful for understanding the performance of a logging infrastructure under load and as a component in a telemetery-based monitoring system.
 ```bash
-$ lumbersexual --latency --uri https://my.elasticsearch.cluster:9200/ --statsdhost localhost
+$ lumbersexual --latency --uri https://my.elasticsearch.cluster:9200 --statsdhost localhost
 ```
 
-The `--all` switch can be used to choose between search today's index only (be careful around midnight!), or across all indicies. The latter is useful if you've a rolling online retention period and want to observe the effect on search latency by changes to that.
+The `--all` switch can be used to choose between searching today's index only (be careful around midnight!), or across all indicies. The latter is useful if you've a rolling online retention period and want to observe the effect on search latency by changes to that.
 
 ## Development
 
