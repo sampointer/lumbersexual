@@ -53,11 +53,13 @@ module Lumbersexual
           adjusted_latency = latency - (@options[:interval] * @sleep_count)
           puts "Measured Latency: #{latency}"
           puts "Interval Adjusted Latency: #{adjusted_latency}"
+          statsd.gauge 'runs.failed', 0 if @options[:statsdhost]
           statsd.gauge 'runs.successful', 1 if @options[:statsdhost]
           statsd.gauge 'rtt.measured', latency if @options[:statsdhost] if @options[:statsdhost]
           statsd.gauge 'rtt.adjusted', adjusted_latency if @options[:statsdhost] if @options[:statsdhost]
         else
           statsd.gauge 'runs.failed', 1 if @options[:statsdhost]
+          statsd.gauge 'runs.successful', 0 if @options[:statsdhost]
           puts "Latency: unknown, message not found"
         end
       end
