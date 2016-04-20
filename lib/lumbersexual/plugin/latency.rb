@@ -26,7 +26,7 @@ module Lumbersexual
           index_name = Time.now.strftime('logstash-%Y.%m.%d')
         end
 
-        @uuid = SecureRandom.uuid
+        @uuid = SecureRandom.uuid.delete('-')
         @sleep_count = 0
         @start_time = Time.now
         Timeout::timeout(@options[:timeout]) {
@@ -37,7 +37,7 @@ module Lumbersexual
 
           until @found do
             result = elastic.search index: index_name, q: @uuid
-            @found = true if result['hits']['total'] == 1
+            @found = true if result['hits']['total'] > 0
             @sleep_count += 1
             sleep @options[:interval]
           end
