@@ -25,16 +25,16 @@ module Lumbersexual
           index_name = Time.now.strftime('logstash-%Y.%m.%d')
         end
 
-        uuid = SecureRandom.uuid
+        @uuid = SecureRandom.uuid
         @sleep_count = 0
         @start_time = Time.now
         Timeout::timeout(@options[:timeout]) {
           syslog = Syslog.open('lumbersexual-ping', Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, Syslog::LOG_INFO)
-          syslog.log(Syslog::LOG_WARNING, uuid)
+          syslog.log(Syslog::LOG_WARNING, @uuid)
           syslog.close
 
           until @found do
-            result = elastic.search index: index_name, q: uuid
+            result = elastic.search index: index_name, q: @uuid
             @found = true if result['hits']['total'] == 1
             @sleep_count += 1
             sleep @options[:interval]
@@ -60,7 +60,7 @@ module Lumbersexual
         else
           statsd.gauge 'runs.failed', 1 if @options[:statsdhost]
           statsd.gauge 'runs.successful', 0 if @options[:statsdhost]
-          puts "Latency: unknown, message not found"
+          puts "Latency: unknown, uuid #{@uuid} not found"
         end
       end
     end
