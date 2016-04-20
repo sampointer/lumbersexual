@@ -6,6 +6,7 @@ require "uri"
 require "syslog"
 require "timeout"
 require "elasticsearch"
+require "logger"
 
 module Lumbersexual
   module Plugin
