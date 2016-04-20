@@ -31,7 +31,7 @@ module Lumbersexual
         Timeout::timeout(@options[:timeout]) {
           syslog = Syslog.open('lumbersexual-ping', Syslog::LOG_CONS | Syslog::LOG_NDELAY | Syslog::LOG_PID, Syslog::LOG_INFO)
           syslog.log(Syslog::LOG_WARNING, @uuid)
-          puts "Logged #{@uuid} at #{Time.now} (#{Time.now.to})"
+          puts "Logged #{@uuid} at #{Time.now} (#{Time.now.to_i})"
           syslog.close
 
           until @found do
@@ -43,7 +43,7 @@ module Lumbersexual
         }
 
         @end_time = Time.now
-        puts "Found #{@uuid} at #{Time.now} (#{Time.now.to})"
+        puts "Found #{@uuid} at #{Time.now} (#{Time.now.to_i})"
         raise Interrupt
       end
 
