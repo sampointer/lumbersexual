@@ -12,6 +12,7 @@ options = Slop.parse do |o|
   o.bool    '-h', '--help', 'print this message' 
   o.integer '-i', '--interval', 'in latency mode, the interval in seconds to sleep between index queries (default 0.1)', default: 0.1
   o.bool    '-l', '--latency', 'run in latency rather than generation mode (default: no)', default: nil
+  o.bool    '-L', '--log', 'in latency mode log elasticsearch output (default: no)', default: nil
   o.integer '-M', '--maxwords', 'maximum number of words per message (default: 20)', default: 20
   o.integer '-m', '--minwords', 'minimum number of words per message (default: 3)', default: 3
   o.array   '-p', '--priorities', 'additional comma-seperated priorities', default: []
