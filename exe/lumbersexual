@@ -2,8 +2,15 @@
 
 require "lumbersexual"
 require "slop"
-require "etc"
 require "uri"
+
+ruby_version = RUBY_VERSION.split('.').join.to_i
+if ruby_version >= 220
+  require 'etc'
+  nprocessors = Etc.nprocessors
+else
+  nprocessors = %x[ nproc ]
+end
 
 options = Slop.parse do |o|
   o.bool    '-a', '--all', 'search all indices rather than today\'s in latency mode', default: nil
@@ -18,7 +25,7 @@ options = Slop.parse do |o|
   o.array   '-p', '--priorities', 'additional comma-seperated priorities', default: []
   o.integer '-r', '--rate', 'messages per second per thread (default: 50, 0 for unlimited)', default: 50
   o.string  '-s', '--statsdhost', 'send statsd telemetry to the named host (default: off)', default: nil
-  o.integer '-T', '--threads', 'number of threads (defaults to number of cores * 2)', default: Etc.nprocessors * 2
+  o.integer '-T', '--threads', 'number of threads (defaults to number of cores * 2)', default: nprocessors * 2
   o.integer '-t', '--timeout', 'length of execution. 0 for forever (default: 0)', default: 0
   o.string  '-u', '--uri', 'elasticsearch uri when run in latency mode (default: http://localhost:9200/)', default: URI::parse("http://localhost:9200/")
 end
