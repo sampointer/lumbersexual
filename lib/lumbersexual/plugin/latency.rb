@@ -18,7 +18,11 @@ module Lumbersexual
       end
 
       def perform
-        elastic = Elasticsearch::Client.new url: @options[:uri], logger: Logger.new(STDERR), log: @options[:log]
+        if @options[:log]
+          elastic = Elasticsearch::Client.new url: @options[:uri], logger: Logger.new(STDERR), log: @options[:log]
+        else
+          elastic = Elasticsearch::Client.new url: @options[:uri]
+        end
 
         if @options[:all]
           index_name = '_all'
