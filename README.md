@@ -1,4 +1,4 @@
-# Lumbersexual [![Build Status](https://travis-ci.org/sampointer/lumbersexual.svg?branch=master)](https://travis-ci.org/sampointer/lumbersexual) [![Gem Version](https://badge.fury.io/rb/lumbersexual.svg)](https://badge.fury.io/rb/lumbersexual)
+# Lumbersexual [![Build Status](https://travis-ci.org/sampointer/lumbersexual.svg?branch=master)](https://travis-ci.org/sampointer/lumbersexual) [![Gem Version](https://badge.fury.io/rb/lumbersexual.svg)](https://badge.fury.io/rb/lumbersexual) ![](http://ruby-gem-downloads-badge.herokuapp.com/lumbersexual)
 
 <img align="right" width="158" height="144" src="etc/assets/lumber-156795_960_720.png" alt="Lumbersexual" />
 Benchmarking tool for the purposes of testing syslog throughput, ELK stacks, aggregated logging infrastructures and log index performance.
