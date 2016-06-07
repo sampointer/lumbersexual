@@ -50,6 +50,16 @@ Ingestion latency mode generates a syslog message with a unique identifier and t
 $ lumbersexual --latency --uri https://my.elasticsearch.cluster:9200 --statsdhost localhost
 ```
 
+The following telemetry is produced:
+```
+lumbersexual.latency.runs.failed      # gauge
+lumbersexual.latency.runs.successful  # gauge
+lumbersexual.latency.rtt.measured     # gauge (seconds)
+lumbersexual.latency.rtt.adjusted     # gauge (seconds)
+```
+
+The `rtt.adjusted` metric is a normalized latency that takes into account the `--interval` period between index queries.
+
 The `--all` switch can be used to choose between searching today's index only (be careful around midnight!), or across all indices. The latter is useful if you've a rolling online retention period and want to observe the effect on search latency by changes to that.
 
 ## Development
