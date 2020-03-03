@@ -1,8 +1,7 @@
 language: ruby
 cache: bundler
-dist: trusty
 jdk:
-  - openjdk7
+  - openjdk8
 rvm:
 - 2.5
 - jruby-9.2.9.0
