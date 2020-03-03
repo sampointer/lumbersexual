@@ -5,7 +5,7 @@ jdk:
 rvm:
 - 2.5
 - jruby-9.2.9.0
-before_install: gem uninstall bundler -a && gem install bundler -v 1.16.6
+before_install: gem uninstall bundler -ax && gem install bundler -v 1.16.6
 deploy:
   provider: rubygems
   ruby: jruby-9.2.9.0
