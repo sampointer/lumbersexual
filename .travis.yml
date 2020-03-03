@@ -1,5 +1,6 @@
 language: ruby
 cache: bundler
+dist: trusty
 jdk:
   - openjdk7
 rvm:
