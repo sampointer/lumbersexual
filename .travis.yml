@@ -1,16 +1,16 @@
 language: ruby
 cache: bundler
 jdk:
-  - openjdk8
+- openjdk8
 rvm:
 - jruby-9.2.11.0
 before_install: gem uninstall bundler -ax && gem install bundler -v 1.16.6
 deploy:
   provider: rubygems
   ruby: jruby-9.2.11.0
-  api_key:
-    secure: qpkX3I/j5aXJvD5pBdiddZ63uCxMsQFeTsWkingDkLsxV/DPAiTn9orwmU3XnYfZfr7tU2z8UztHzqPtIfFmTD/v6FLDqLUzYL8SpfZIuu4BgzbFhQ7fpw2me6a1ISOGz5wkMQ34klZMuPZjX2x9KjrkDh8ZSsZziHi2cpkbj0JLW91ezW+W8yrQvOm/dch0uXMLEOlbxbjPjHr76bFQqvkc2Z0YprxK2j525t3+SEnVN51DiVGimPlUrIQ+mtjGOqbZYCMw4rBex+BdQS9T4as6pG/BT1Tk92MFE/gRMJg9QO/DqwolB3mGNBEYR+3skGktz2UBMSGu6XDFxEOqOgK0joe+ehfiL1Oq2hnp482vHODl06HjYIjVlsXGT7aD7C4TcA2yrRW5hg8UaYoVkIbiZz26GrXX8vEZ4C4HgRruQkyt31cLvhdRPJvStkXzgQQXbwmS6P3lkRE3gxwYyeuzblpbprg2Nolmt9GO//1yQ497YUsY18tK9fOZr8vz/xiCuDMQRuJcheA9C27Z9nJZB2iH4xTNwNl53eFYhWMVYdkw16JYWJ17xMg+VnWUwkA/jODU0GlXEvNHNFRaDA9qyedIk5ainAnzGJpExCsWuKFJvJl1Qn2bD3/neruCIBoCaxQOdBrGd/579ALyjkujRmgZTOiaqRh4DaYHGrg=
   gem: lumbersexual
   on:
     tags: true
     repo: sampointer/lumbersexual
+  api_key:
+    secure: cUzFmVylR/LA++ppYNlyDpCePqVFc+x/Pf9qd/TNE3ZqCbhihpRT0dS+HalfB/2hziUCuXEkkJGEDEy6oSibrZT1Up6nEFl7w61dQKOkZPe6r7JA7eQ0tQq0uPqNbU6vawTtB0LF/p5AAQBVlu6b0k8BrFNgFebbCHZjbz6EDCczhlnICTFUbauqQYPxSnM7G1jlALhUTSU9VMC7sTYwXDBbTh0lSBrejGoMuvUitfdw6G7hl468kimamyCjRB927IDvQ+a1E3qSCip5aVt41oPubz760L8a6Qg0TwHmtJ3bmW0bqpAbaLzIdpaCGjg1E3x4GdtD/SnvE9oDyoZUrPLm+f0V0sYocMx+1oCsegb07uiZCEfpuGfKovgumcp8IKNMfmgOhzXMmiZhmyIwpmGBC+7jK1AJqoiauNEhZPEQza4nf2MIGft/PsBe4DacTVfkeMXpRYdOSS8guJvd7VJVFUPa6Pdg6NaDnC/ovW2jWW2tII+O917Guzl1w2xoWKChVcHVwHuN2vlQ2VZmB97STUEgDZnO3P0Kz9PwuBoAPQhEiUztpxT4SKDFsdzcGwL+h3jDPy8B3fCO50thdBr1yEnvnL9jyHZFHSXDXRJQBx4LNNWItKW59QdyTJYHCp4wyEeYKTtrTbSkCRRlT46/n2D7Nq9N0wnIRNZsz+w=
